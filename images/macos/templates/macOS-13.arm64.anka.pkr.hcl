@@ -2,7 +2,7 @@ packer {
   required_plugins {
     veertu-anka = {
       version = ">= v3.2.0"
-      source = "github.com/veertuinc/veertu-anka"
+      source  = "github.com/veertuinc/veertu-anka"
     }
   }
 }
@@ -20,53 +20,53 @@ variable "build_id" {
 }
 
 variable "vm_username" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "vm_password" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "github_api_pat" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "xcode_install_storage_url" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "xcode_install_sas" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "vcpu_count" {
-  type = string
+  type    = string
   default = "6"
 }
 
 variable "ram_size" {
-  type = string
+  type    = string
   default = "8G"
 }
 
 variable "image_os" {
-  type = string
+  type    = string
   default = "macos13"
 }
 
 source "veertu-anka-vm-clone" "template" {
-  vm_name = "${var.build_id}"
+  vm_name        = "${var.build_id}"
   source_vm_name = "${var.source_vm_name}"
-  source_vm_tag = "${var.source_vm_tag}"
-  vcpu_count = "${var.vcpu_count}"
-  ram_size = "${var.ram_size}"
-  stop_vm = "true"
-  log_level = "debug"
+  source_vm_tag  = "${var.source_vm_tag}"
+  vcpu_count     = "${var.vcpu_count}"
+  ram_size       = "${var.ram_size}"
+  stop_vm        = "true"
+  log_level      = "debug"
 }
 
 build {
@@ -89,23 +89,23 @@ build {
   }
   provisioner "file" {
     destination = "image-generation/software-report/"
-    source = "../../helpers/software-report-base"
+    source      = "../../helpers/software-report-base"
   }
   provisioner "file" {
     destination = "image-generation/add-certificate.swift"
-    source = "./provision/configuration/add-certificate.swift"
+    source      = "./provision/configuration/add-certificate.swift"
   }
   provisioner "file" {
     destination = ".bashrc"
-    source = "./provision/configuration/environment/bashrc"
+    source      = "./provision/configuration/environment/bashrc"
   }
   provisioner "file" {
     destination = ".bash_profile"
-    source = "./provision/configuration/environment/bashprofile"
+    source      = "./provision/configuration/environment/bashprofile"
   }
   provisioner "file" {
     destination = "./"
-    source = "./provision/utils"
+    source      = "./provision/utils"
   }
   provisioner "shell" {
     inline = [
@@ -114,11 +114,11 @@ build {
   }
   provisioner "file" {
     destination = "bootstrap"
-    source = "./provision/bootstrap-provisioner/"
+    source      = "./provision/bootstrap-provisioner/"
   }
   provisioner "file" {
     destination = "image-generation/toolset.json"
-    source = "./toolsets/toolset-13.json"
+    source      = "./toolsets/toolset-13.json"
   }
   provisioner "shell" {
     scripts = [
@@ -155,8 +155,8 @@ build {
     execute_command = "chmod +x {{ .Path }}; source $HOME/.bash_profile; {{ .Vars }} {{ .Path }}"
   }
   provisioner "shell" {
-    script  = "./provision/core/reboot.sh"
-    execute_command = "chmod +x {{ .Path }}; source $HOME/.bash_profile; sudo {{ .Vars }} {{ .Path }}"
+    script            = "./provision/core/reboot.sh"
+    execute_command   = "chmod +x {{ .Path }}; source $HOME/.bash_profile; sudo {{ .Vars }} {{ .Path }}"
     expect_disconnect = true
   }
   provisioner "shell" {
@@ -189,8 +189,8 @@ build {
     execute_command = "chmod +x {{ .Path }}; source $HOME/.bash_profile; {{ .Vars }} pwsh -f {{ .Path }}"
   }
   provisioner "shell" {
-    script = "./provision/core/reboot.sh"
-    execute_command = "chmod +x {{ .Path }}; source $HOME/.bash_profile; sudo {{ .Vars }} {{ .Path }}"
+    script            = "./provision/core/reboot.sh"
+    execute_command   = "chmod +x {{ .Path }}; source $HOME/.bash_profile; sudo {{ .Vars }} {{ .Path }}"
     expect_disconnect = true
   }
   provisioner "shell" {
@@ -219,7 +219,7 @@ build {
     execute_command = "chmod +x {{ .Path }}; source $HOME/.bash_profile; {{ .Vars }} pwsh -f {{ .Path }}"
   }
   provisioner "shell" {
-    script = "./provision/core/delete-duplicate-sims.rb"
+    script          = "./provision/core/delete-duplicate-sims.rb"
     execute_command = "source $HOME/.bash_profile; ruby {{ .Path }}"
   }
   provisioner "shell" {
@@ -231,8 +231,8 @@ build {
   }
   provisioner "file" {
     destination = "../image-output/"
-    direction = "download"
-    source = "./image-generation/output/"
+    direction   = "download"
+    source      = "./image-generation/output/"
   }
   provisioner "shell" {
     scripts = [
