@@ -1,0 +1,10 @@
+ethernets:
+  eth0:
+    match:
+      macaddress: "{{ vm_mac_address }}"
+    set-name: eth0 
+    dhcp4: true
+    routes:
+      - to: 0.0.0.0/0
+        via: "{{ default_gw }}"
+version: 2

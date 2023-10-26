@@ -1,0 +1,21 @@
+#cloud-config
+ssh_pwauth: false
+apt_mirror: http://jp.archive.ubuntu.com/ubuntu/
+users:
+  - name: runneradmin
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    gecos: Ubuntu
+    uid: 1000
+    ssh_authorized_keys:
+      - {{ ssh_pem_pubkey }}
+    lock_passwd: true
+
+runcmd:
+  # add dns config to avoid name resolve error
+  - [ sh, -c, 'netplan set ethernets.$(ip l | grep "^2:" | awk "{print \$2}" | tr -d ":").nameservers.addresses=[1.1.1.1,1.0.0.1]' ]
+  - [ sh, -c, 'chmod 600 /etc/netplan/50-cloud-init.yaml' ]
+  - [ sh, -c, 'netplan apply' ]
+  - [ sh, -c, 'echo "network: {config: disabled}" | sudo tee /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg' ]
+  # add hostname into /etc/hosts to suppress error when sudo
+  - [ sh, -c, 'echo "$(echo 127.0.0.1 ubuntu; cat /etc/hosts)" > /etc/hosts' ]

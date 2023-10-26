@@ -397,3 +397,10 @@ launch.json
 
 # Ignore dynamic template
 images/*/*-temp.json
+
+# output files
+/images/linux/output-ubuntu/
+/cloud-data/user-data
+/launcher/user-data
+/launcher/meta-data
+/launcher/network-config

@@ -1,0 +1,28 @@
+#cloud-config
+
+hostname: "{{ vm_hostname }}"
+ssh_pwauth: false
+locale: C.UTF-8
+timezone: Etc/UTC
+
+users:
+  - name: {{ vm_username }}
+    groups: [adm, systemd-journal]
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    uid: 1001
+    # note: github actions runner is not setting password but set it for convenience so you can delete it.
+    lock_passwd: false
+    passwd: $6$ENHASfs4QxiHJ4Uu$6pzY4lL7NNAtE3rCLmky1wZ0BYdlh4NUEId1v7RJ7LNHdTFbElF.yfkY00UZT3eYk7yTK0mAZzpWlHhW1KQ5a/
+
+runcmd:
+  # adjust gid to same with github actions runner
+  - [ sh, -c, 'usermod -g docker {{ vm_username }}' ]
+  # add $HOME/work dir
+  # you can clone your repo under this dir.
+  - [ sh, -c, 'mkdir -p /home/{{ vm_username }}/work/' ]
+# -- not runner-same actions just customize for convenience. --
+  # add hostname to /etc/hosts to avoid takeing too long time when sudo
+  - [ sh, -c, 'echo "$(echo 127.0.0.1 {{ vm_hostname }}; cat /etc/hosts)" > /etc/hosts' ]
+  # add sshpubkey from gh
+  - [ sh, -c, 'ssh-import-id -o /home/{{ vm_username }}/.ssh/authorized_keys gh:{{ github_username }}; chown -R {{ vm_username }}: /home/{{ vm_username }}/.ssh/' ]
